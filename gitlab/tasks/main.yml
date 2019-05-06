@@ -1,0 +1,29 @@
+---
+
+- name: install nfs client
+  action: yum pkg=nfs-utils state=present
+
+- name: Ensure rpcbind is running
+  action: service name=rpcbind state=started enabled=yes
+
+- name: Ensure nfs-sever is running
+  action: service name=nfs-server state=started enabled=yes
+
+- name: Ensure nfs-lock is running
+  action: service name=nfs-lock state=started enabled=yes
+
+- name: Ensure nfs-idmap is running
+  action: service name=nfs-idmap state=started enabled=yes
+
+- name: Creates directory
+  file:
+    path: "{{ nfs_mount }}"
+    state: directory
+
+- shell: if [ -z "$nfsoptions" ]; then  echo defaults,soft,rsize=1048576,wsize=1048576,noatime,nofail,lookupcache=positive 0 2; else echo $nfsoptions; fi
+  register: _nfsopts
+  sudo: false
+  connection: local
+
+- name: configure /etc/fstab on clients
+  action: mount name="{{ nfs_mount }}" src="{{ nfs_server }}":"{{ nfs_path }}" fstype=nfs opts="{{ _nfsopts.stdout }}" state=mounted

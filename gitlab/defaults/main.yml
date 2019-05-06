@@ -1,0 +1,6 @@
+---
+# defaults file for gitlab
+gitlab_config_template: "gitlab.rb.j2"
+nfs_mount: "/media/nfs_share"
+nfs_server: "127.0.0.1"
+nfs_path: "/home"
